@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Аня Виголайнен](https://up.htmlacademy.ru/javascript/14/user/49149).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Смирнов](https://htmlacademy.ru/profile/id516117).
 
 ---
 
