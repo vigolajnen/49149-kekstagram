@@ -15,22 +15,19 @@ var getRandomValue = function (array) {
   return array[rand];
 };
 
-var createPhotos = function () {
+var getPhoto = function (index) {
   return {
-    url: 'photos/' + getRandomInt(1, QUANTITY_IMAGES) + '.jpg',
+    url: 'photos/' + ++index + '.jpg',
     likes: getRandomInt(LIKES_MIN, LIKES_MAX),
-    comments: getRandomValue(photosComments),
+    comments: [getRandomValue(photosComments)],
     description: getRandomValue(photosDescriptions)
   };
 };
 
 var photos = [];
 for (var j = 0; j < QUANTITY_IMAGES; j++) {
-  photos.push(createPhotos());
+  photos.push(getPhoto(j));
 }
-
-// 2. На основе данных, созданных в предыдущем пункте и шаблона #picture создайте DOM-элементы
-// 3. Отрисуйте сгенерированные DOM-элементы в блок .pictures
 
 var renderPhotos = function () {
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
@@ -48,23 +45,15 @@ var renderPhotos = function () {
   return pictureListElement.appendChild(documentFragment);
 };
 
-// 4. Покажите элемент .big-picture и заполните его данными из первого элемента сгенерированного вами массива
 document.querySelector('.big-picture').classList.remove('hidden');
 
 var renderBigPhotos = function () {
-  var pictureTemplate = document.querySelector('.big-picture__preview');
   var pictureBigElement = document.querySelector('.big-picture');
-  var fragmentModal = document.createDocumentFragment();
-  var pictureElement = pictureTemplate.cloneNode(true);
-
-  pictureElement.querySelector('.big-picture__img img').src = photos[0].url;
-  pictureElement.querySelector('.likes-count').textContent = photos[0].likes;
-  pictureElement.querySelector('.comments-count').textContent = photos[0]['comments'].length;
-  pictureElement.querySelector('.social__caption').textContent = photos[0].description;
-
-  fragmentModal.appendChild(pictureElement);
-
-  return pictureBigElement.appendChild(fragmentModal);
+  pictureBigElement.querySelector('.big-picture__img img').src = photos[0].url;
+  pictureBigElement.querySelector('.likes-count').textContent = photos[0].likes;
+  pictureBigElement.querySelector('.comments-count').textContent = photos[0]['comments'].length;
+  pictureBigElement.querySelector('.social__caption').textContent = photos[0].description;
+  return;
 };
 
 var commentsBigPhotos = function () {
@@ -77,13 +66,11 @@ var commentsBigPhotos = function () {
   for (var i = 0; i < countComment; i++) {
     commentElement.querySelector('.social__picture').src = 'img/avatar-' + getRandomInt(1, 6) + '.svg';
     commentElement.querySelector('.social__text').textContent = photos[0].comments[i];
-
     commentFragment.appendChild(commentElement);
   }
   return commentListElement.appendChild(commentFragment);
 };
-// console.log(commentsBigPhotos());
-// 5. Спрячьте блоки счётчика комментариев .social__comment-count и загрузки новых комментариев .social__loadmore, добавив им класс .visually-hidden.
+
 var hiddenElement = function () {
   var list = document.querySelectorAll('.social__comment-count, .social__loadmore');
   for (var i = 0; i < list.length; i++) {
