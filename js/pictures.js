@@ -17,7 +17,8 @@ var getRandomValue = function (array) {
 
 var getComments = function () {
   var randomComments = [];
-  for (var i = 0; i < getRandomInt(1, 2); i++) {
+  var count = getRandomInt(1, 2);
+  for (var i = 0; i < count; i++) {
     randomComments.push(getRandomValue(photosComments));
   }
   return randomComments;
@@ -25,7 +26,7 @@ var getComments = function () {
 
 var getPhoto = function (index) {
   return {
-    url: 'photos/' + ++index + '.jpg',
+    url: 'photos/' + index + '.jpg',
     likes: getRandomInt(LIKES_MIN, LIKES_MAX),
     comments: getComments(),
     description: getRandomValue(photosDescriptions)
@@ -33,7 +34,7 @@ var getPhoto = function (index) {
 };
 
 var photos = [];
-for (var j = 0; j < QUANTITY_IMAGES; j++) {
+for (var j = 1; j < QUANTITY_IMAGES; j++) {
   photos.push(getPhoto(j));
 }
 
