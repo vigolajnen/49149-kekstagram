@@ -125,9 +125,41 @@ var onCloseBigPhotoClick = function () {
 for (var i = 0; i < linkPhoto.length; i++) {
   linkPhoto[i].addEventListener('click', function (evt) {
     evt.preventDefault();
-    renderBigPhotos(evt);
+    renderBigPhotos(getPhoto(evt));
     onOpenBigPhotoClick();
   });
 }
 
 closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
+
+
+// Загрузка изображения и показ формы редактирования
+
+var uploadPhoto = document.querySelector('#upload-file');
+var editPhoto = document.querySelector('.img-upload__overlay');
+var closeEditPhoto = document.querySelector('#upload-cancel');
+
+uploadPhoto.addEventListener('change', function () {
+  editPhoto.classList.remove('hidden');
+});
+
+var onEditPhotoEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseEditPhotoClick();
+  }
+};
+
+document.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseEditPhotoClick();
+  }
+});
+
+var onCloseEditPhotoClick = function () {
+  editPhoto.classList.add('hidden');
+  document.removeEventListener('keydown', onEditPhotoEscPress);
+};
+
+closeEditPhoto.addEventListener('click', function () {
+  onCloseEditPhotoClick();
+});
