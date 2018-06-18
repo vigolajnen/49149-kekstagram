@@ -54,8 +54,6 @@ var renderPhotos = function () {
   return pictureListElement.appendChild(documentFragment);
 };
 
-document.querySelector('.big-picture').classList.remove('hidden');
-
 var renderBigPhotos = function () {
   var pictureBigElement = document.querySelector('.big-picture');
   pictureBigElement.querySelector('.big-picture__img img').src = photos[0].url;
@@ -80,7 +78,7 @@ var commentsBigPhotos = function () {
     commentImage.alt = 'Аватар комментатора фотографии';
     commentImage.width = 35;
     commentImage.height = 35;
-    commentElement.querySelector('.social__text').textContent = photos[0].comments;
+    commentElement.querySelector('.social__text').textContent = photos[i].comments;
     commentFragment.appendChild(commentElement);
   }
   return commentListElement.appendChild(commentFragment);
@@ -95,6 +93,41 @@ var hiddenElement = function () {
 };
 
 renderPhotos();
-renderBigPhotos();
 commentsBigPhotos();
 hiddenElement();
+
+// открытие и закрытие полноэкранного режима по нажатию на ссылку
+var bigPhoto = document.querySelector('.big-picture');
+var linkPhoto = document.querySelectorAll('.picture__link');
+var closeBigPhoto = document.querySelector('.big-picture__cancel');
+var ESC_KEYCODE = 27;
+
+var onBigPhotoEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseBigPhotoClick();
+  }
+};
+
+var onOpenBigPhotoClick = function () {
+  bigPhoto.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      onCloseBigPhotoClick();
+    }
+  });
+};
+
+var onCloseBigPhotoClick = function () {
+  bigPhoto.classList.add('hidden');
+  document.removeEventListener('keydown', onBigPhotoEscPress);
+};
+
+for (var i = 0; i < linkPhoto.length; i++) {
+  linkPhoto[i].addEventListener('click', function (evt) {
+    evt.preventDefault();
+    renderBigPhotos(evt);
+    onOpenBigPhotoClick();
+  });
+}
+
+closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
