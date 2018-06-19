@@ -49,6 +49,13 @@ var renderPhotos = function () {
     pictureElement.querySelector('.picture__stat--likes').textContent = photos[i].likes;
     pictureElement.querySelector('.picture__stat--comments').textContent = photos[i]['comments'].length;
 
+    pictureElement.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      renderBigPhotos(evt);
+      commentsBigPhotos(evt);
+      onOpenBigPhotoClick();
+    });
+
     documentFragment.appendChild(pictureElement);
   }
   return pictureListElement.appendChild(documentFragment);
@@ -93,12 +100,10 @@ var hiddenElement = function () {
 };
 
 renderPhotos();
-commentsBigPhotos();
 hiddenElement();
 
 // открытие и закрытие полноэкранного режима по нажатию на ссылку
 var bigPhoto = document.querySelector('.big-picture');
-var linkPhoto = document.querySelectorAll('.picture__link');
 var closeBigPhoto = document.querySelector('.big-picture__cancel');
 var ESC_KEYCODE = 27;
 
@@ -121,14 +126,6 @@ var onCloseBigPhotoClick = function () {
   bigPhoto.classList.add('hidden');
   document.removeEventListener('keydown', onBigPhotoEscPress);
 };
-
-for (var i = 0; i < linkPhoto.length; i++) {
-  linkPhoto[i].addEventListener('click', function (evt) {
-    evt.preventDefault();
-    renderBigPhotos(getPhoto(evt));
-    onOpenBigPhotoClick();
-  });
-}
 
 closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
 
@@ -164,14 +161,13 @@ closeEditPhoto.addEventListener('click', function () {
 
 // Наложение эффекта на изображение
 var getEffect = function () {
-  var effectBlock = document.querySelector('.img-upload__effects');
+  var effectList = document.querySelector('.effects__list');
 
-  effectBlock.addEventListener('click', function (evt) {
-
+  effectList.addEventListener('click', function (evt) {
     var effectPreview = document.querySelector('.img-upload__preview img');
     var target = evt.target;
     var label = target.parentNode.getAttribute('for');
-    var effectName = 'effects__preview--' + label.replace('effect-', '');
+    var effectName = label.replace('effect-', 'effects__preview--');
     effectPreview.setAttribute('class', effectName);
   });
 };
