@@ -132,9 +132,7 @@ for (var i = 0; i < linkPhoto.length; i++) {
 
 closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
 
-
 // Загрузка изображения и показ формы редактирования
-
 var uploadPhoto = document.querySelector('#upload-file');
 var editPhoto = document.querySelector('.img-upload__overlay');
 var closeEditPhoto = document.querySelector('#upload-cancel');
@@ -163,3 +161,19 @@ var onCloseEditPhotoClick = function () {
 closeEditPhoto.addEventListener('click', function () {
   onCloseEditPhotoClick();
 });
+
+// Наложение эффекта на изображение
+var getEffect = function () {
+  var effectBlock = document.querySelector('.img-upload__effects');
+
+  effectBlock.addEventListener('click', function (evt) {
+
+    var effectPreview = document.querySelector('.img-upload__preview img');
+    var target = evt.target;
+    var label = target.parentNode.getAttribute('for');
+    var effectName = 'effects__preview--' + label.replace('effect-', '');
+    effectPreview.setAttribute('class', effectName);
+  });
+};
+
+getEffect();
