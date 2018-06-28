@@ -160,16 +160,150 @@ closeEditPhoto.addEventListener('click', function () {
 });
 
 // Наложение эффекта на изображение
-var getEffect = function () {
+var getEffect = function (inputValue) {
   var effectList = document.querySelector('.effects__list');
 
   effectList.addEventListener('click', function (evt) {
     var effectPreview = document.querySelector('.img-upload__preview img');
     var target = evt.target;
-    var label = target.parentNode.getAttribute('for');
-    var effectName = label.replace('effect-', 'effects__preview--');
+    var inputValue = target.value;
+    var effectName = 'effects__preview--' + inputValue;
     effectPreview.setAttribute('class', effectName);
   });
+
+  return inputValue;
 };
 
+// Интенсивность эффекта - пока только перемещение пина
+var scrollBar = document.querySelector('.scale');
+var pinScrollBar = scrollBar.querySelector('.scale__pin');
+var levelScrollBar = scrollBar.querySelector('.scale__level');
+
+var picturePreview = scrollBar.querySelector('.img-upload__scale');
+
+var changeEffectIntensity = function (value) {
+  pinScrollBar.style.left = value + '%';
+  levelScrollBar.style.width = value + '%';
+};
+
+scrollBar.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX
+  };
+
+  var dragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    dragged = true;
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX
+    };
+
+    startCoords = {
+      x: moveEvt.clientX
+    };
+
+    var styleScrollBar = getComputedStyle(scrollBar);
+    var widthScrollBar = parseInt(styleScrollBar.width.slice(0, -2), 10);
+    var value = parseInt(100 * (levelScrollBar.offsetWidth - shift.x) / (widthScrollBar - 42), 10);
+
+    getEffectPreview();
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    if (dragged) {
+      var onClickPreventDefault = function (evt) {
+        evt.preventDefault();
+        pinScrollBar.removeEventListener('click', onClickPreventDefault);
+      };
+      pinScrollBar.addEventListener('click', onClickPreventDefault);
+    }
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
 getEffect();
+
+var getEffectPreview = function (name, value) {
+  // debugger;
+  getEffect(name);
+  console.log(getEffect(name));
+  // объект еффектов
+  var effectIntensity = [
+    {none: function() {
+      picturePreview.classList.toggle('hidden', true);
+      return 'none';
+    }},
+    {grayscale: function (value) {
+      var max = 1;
+      var index = max * value / 100;
+      return 'grayscale(' + index + ')';
+    }},
+    {sepia: function (value) {
+      var max = 1;
+      var index = max * value / 100;
+      return 'sepia(' + index + ')';
+    }},
+    {marvin : function (value) {
+      return 'invert(' + value + '%)';
+    }},
+    {phobos : function (value) {
+      var max = 3;
+      var index = max * value / 100;
+      return 'blur(' + index + 'px)';
+    }},
+    {heat: function (value) {
+      var max = 3;
+      var index = max * value / 100;
+      return 'brightness(' + index + ')';
+    }}
+  ];
+  var nameEffect = getEffect(name);
+  for (var i = 0; i < effectIntensity.length; i++) {
+    if (effectIntensity[i] === nameEffect) {
+      changeEffectIntensity(value);
+      var effectPreview = document.querySelector('.img-upload__preview img');
+      effectPreview.style.filter = effectIntensity[i] + changeEffectIntensity(value);
+
+    }
+    // console.log(effectIntensity[i]);
+  }
+};
+
+// Масштаб
+var getResize = function () {
+  var resize = document.querySelector('.resize');
+  var controlMinus = resize.querySelector('.resize__control--minus');
+  var controlPlus = resize.querySelector('.resize__control--plus');
+  var resizeValue = resize.querySelector('.resize__control--value');
+  var resizePicture = document.querySelector('.img-upload__preview');
+  var units = resizeValue.value.replace(/\d/g, '');
+  var MAX_RESIZE = 100 + '%';
+  resizeValue.value = MAX_RESIZE;
+
+  controlPlus.addEventListener('click', function () {
+    if (parseInt(resizeValue.value, 10) <= 75) {
+      resizeValue.value = parseInt(resizeValue.value, 10) + 25 + units;
+      resizePicture.style.transform = 'scale(' + parseInt(resizeValue.value, 10) / 100 + ')';
+    }
+  });
+
+  controlMinus.addEventListener('click', function () {
+    if (parseInt(resizeValue.value, 10) > 25) {
+      resizeValue.value = parseInt(resizeValue.value, 10) - 25 + units;
+      resizePicture.style.transform = 'scale(' + parseInt(resizeValue.value, 10) / 100 + ')';
+    }
+  });
+};
+getResize();
