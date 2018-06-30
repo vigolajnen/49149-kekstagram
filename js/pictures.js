@@ -38,6 +38,15 @@ for (var j = 1; j < QUANTITY_IMAGES; j++) {
   photos.push(getPhoto(j));
 }
 
+var saveIndex = function (index) {
+  return function (evt) {
+    evt.preventDefault();
+    renderBigPhotos(photos[index]);
+    commentsBigPhotos(evt);
+    onOpenBigPhotoClick();
+  };
+};
+
 var renderPhotos = function () {
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
   var pictureListElement = document.querySelector('.pictures');
@@ -49,24 +58,19 @@ var renderPhotos = function () {
     pictureElement.querySelector('.picture__stat--likes').textContent = photos[i].likes;
     pictureElement.querySelector('.picture__stat--comments').textContent = photos[i]['comments'].length;
 
-    pictureElement.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      renderBigPhotos(evt);
-      commentsBigPhotos(evt);
-      onOpenBigPhotoClick();
-    });
+    pictureElement.addEventListener('click', saveIndex(i));
 
     documentFragment.appendChild(pictureElement);
   }
   return pictureListElement.appendChild(documentFragment);
 };
 
-var renderBigPhotos = function () {
+var renderBigPhotos = function (photo) {
   var pictureBigElement = document.querySelector('.big-picture');
-  pictureBigElement.querySelector('.big-picture__img img').src = photos[0].url;
-  pictureBigElement.querySelector('.likes-count').textContent = photos[0].likes;
-  pictureBigElement.querySelector('.comments-count').textContent = photos[0]['comments'].length;
-  pictureBigElement.querySelector('.social__caption').textContent = photos[0].description;
+  pictureBigElement.querySelector('.big-picture__img img').src = photo.url;
+  pictureBigElement.querySelector('.likes-count').textContent = photo.likes;
+  pictureBigElement.querySelector('.comments-count').textContent = photo['comments'].length;
+  pictureBigElement.querySelector('.social__caption').textContent = photo.description;
   return;
 };
 
@@ -169,24 +173,26 @@ var getEffect = function () {
     var inputValue = target.value;
     var effectName = 'effects__preview--' + inputValue;
     effectPreview.setAttribute('class', effectName);
+    getEffectStyle(name, 100);
+    changeEffectIntensity(100);
   });
-  return;
 };
 
 // Интенсивность эффекта - пока только перемещение пина
 var scrollBar = document.querySelector('.scale');
 var pinScrollBar = scrollBar.querySelector('.scale__pin');
 var levelScrollBar = scrollBar.querySelector('.scale__level');
-var picturePreview = scrollBar.querySelector('.img-upload__scale');
+var line = scrollBar.querySelector('.scale__line');
 
 scrollBar.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
-
+  var widthScrollBar = line.clientWidth;
   var startCoords = {
     x: evt.clientX
   };
 
   var onMouseMove = function (moveEvt) {
+
     moveEvt.preventDefault();
 
     var shift = {
@@ -197,12 +203,14 @@ scrollBar.addEventListener('mousedown', function (evt) {
       x: moveEvt.clientX
     };
 
-    pinScrollBar.style.left = (pinScrollBar.offsetLeft - shift.x) + 'px';
-    var styleScrollBar = getComputedStyle(scrollBar);
-    var widthScrollBar = parseInt(styleScrollBar.width.slice(0, -2), 10);
-    var value = parseInt(100 * (levelScrollBar.offsetWidth - shift.x) / (widthScrollBar), 10);
+    var posX = pinScrollBar.offsetLeft - shift.x;
 
-    changeEffectIntensity(value);
+    if (posX <= widthScrollBar) {
+      pinScrollBar.style.left = posX + 'px';
+      var value = parseInt(100 * (levelScrollBar.offsetWidth - shift.x) / (widthScrollBar), 10);
+      changeEffectIntensity(value);
+      getEffectStyle(name, value);
+    }
   };
 
   var onMouseUp = function (upEvt) {
@@ -221,53 +229,42 @@ var changeEffectIntensity = function (value) {
   levelScrollBar.style.width = value + '%';
 };
 
-getEffect();
-
-var getEffectPreview = function () {
-  // debugger;
-  getEffect(name);
-  // console.log(getEffect(name));
-  // объект еффектов
-  var effectIntensity = [
-    {none: function () {
-      picturePreview.classList.toggle('hidden', true);
-      return 'none';
-    }},
-    {grayscale: function (value) {
+var getEffectStyle = function (name, value) {
+  var previewPicture = document.querySelector('.img-upload__preview');
+  var nameEffect = document.querySelector('input[name="effect"]:checked').value;
+  switch (nameEffect) {
+    case 'none':
+      previewPicture.style.filter = 'none';
+      scrollBar.classList.toggle('hidden', true);
+      break;
+    case 'chrome':
       var max = 1;
       var index = max * value / 100;
-      return 'grayscale(' + index + ')';
-    }},
-    {sepia: function (value) {
-      var max = 1;
-      var index = max * value / 100;
-      return 'sepia(' + index + ')';
-    }},
-    {marvin: function (value) {
-      return 'invert(' + value + '%)';
-    }},
-    {phobos: function (value) {
-      var max = 3;
-      var index = max * value / 100;
-      return 'blur(' + index + 'px)';
-    }},
-    {heat: function (value) {
-      var max = 3;
-      var index = max * value / 100;
-      return 'brightness(' + index + ')';
-    }}
-  ];
-  var nameEffect = getEffect(name);
-  for (var i = 0; i < effectIntensity.length; i++) {
-    if (effectIntensity[i] === nameEffect) {
-
-      var effectPreview = document.querySelector('.img-upload__preview img');
-      effectPreview.style.filter = effectIntensity[i];
-    }
+      previewPicture.style.filter = 'grayscale(' + index + ')';
+      scrollBar.classList.toggle('hidden', false);
+      break;
+    case 'sepia':
+      previewPicture.style.filter = 'sepia(' + (1 * value / 100) + ')';
+      scrollBar.classList.toggle('hidden', false);
+      break;
+    case 'phobos':
+      previewPicture.style.filter = 'blur(' + (3 * value / 100) + 'px)';
+      scrollBar.classList.toggle('hidden', false);
+      break;
+    case 'heat':
+      previewPicture.style.filter = 'brightness(' + (3 * value / 100) + ')';
+      scrollBar.classList.toggle('hidden', false);
+      break;
+    case 'marvin':
+      previewPicture.style.filter = 'invert(' + value + '%)';
+      scrollBar.classList.toggle('hidden', false);
+      break;
+    default:
+      previewPicture.style.filter = 'none';
   }
 };
 
-getEffectPreview();
+getEffect();
 
 // Масштаб
 var getResize = function () {
