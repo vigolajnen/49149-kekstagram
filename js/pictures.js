@@ -173,7 +173,8 @@ var getEffect = function () {
     var inputValue = target.value;
     var effectName = 'effects__preview--' + inputValue;
     effectPreview.setAttribute('class', effectName);
-    getEffectStyle(name, 100);
+    var inputChecked = document.querySelector('input[name="effect"]:checked').value;
+    getEffectStyle(inputChecked, 100);
     changeEffectIntensity(100);
   });
 };
@@ -229,10 +230,10 @@ var changeEffectIntensity = function (value) {
   levelScrollBar.style.width = value + '%';
 };
 
+var previewPicture = document.querySelector('.img-upload__preview');
+
 var getEffectStyle = function (name, value) {
-  var previewPicture = document.querySelector('.img-upload__preview');
-  var nameEffect = document.querySelector('input[name="effect"]:checked').value;
-  switch (nameEffect) {
+  switch (name) {
     case 'none':
       previewPicture.style.filter = 'none';
       scrollBar.classList.toggle('hidden', true);
