@@ -187,7 +187,7 @@ var getEffect = function () {
     var inputChecked = document.querySelector('input[name="effect"]:checked').value;
 
     if (effectName === 'effects__preview--none') {
-      getPicEffect('none', MAX_VALUE_EFFECT);
+      getPicEffect('none');
       scrollBar.classList.toggle('hidden', true);
     } else {
       getPicEffect(getEffectStyle(inputChecked, MAX_VALUE_EFFECT));
@@ -244,35 +244,35 @@ var changeEffectIntensity = function (value) {
 var getEffectStyle = function (name, value) {
   var max = 1;
   var min = 0;
-  var MAX_CHROME = 1;
-  var MAX_SEPIA = 1;
-  var MAX_PHOBOS = 3;
-  var MAX_HEAT = 2;
-  var MAX_MARVIN = 100;
   var filterCss = '';
   var filterUnit = '';
 
   switch (name) {
     case 'chrome':
-      max = MAX_CHROME;
+      max = 1;
+      value = max * value / 100;
       filterCss = 'grayscale';
       break;
     case 'heat':
       min = 1;
-      max = MAX_HEAT;
+      max = 2;
+      value = min + (max * value / 100);
       filterCss = 'brightness';
       break;
     case 'sepia':
-      max = MAX_SEPIA;
+      max = 1;
+      value = max * value / 100;
       filterCss = 'sepia';
       break;
     case 'phobos':
-      max = MAX_PHOBOS;
+      max = 3;
+      value = max * value / 100;
       filterUnit = 'px';
       filterCss = 'blur';
       break;
     case 'marvin':
-      max = MAX_MARVIN;
+      max = 100;
+      value = max * value / 100;
       filterUnit = '%';
       filterCss = 'invert';
       break;
@@ -280,7 +280,6 @@ var getEffectStyle = function (name, value) {
       filterCss = 'none';
   }
 
-  value = min + (max * value / 100);
   filterCss = filterCss + '(' + value + filterUnit + ')';
 
   return filterCss;
