@@ -163,64 +163,74 @@ closeEditPhoto.addEventListener('click', function () {
   onCloseEditPhotoClick();
 });
 
+// Эффекты
+var previewPicture = document.querySelector('.img-upload__preview');
+
+// Интенсивность эффекта
+var scrollBar = document.querySelector('.scale');
+var pinScrollBar = scrollBar.querySelector('.scale__pin');
+var levelScrollBar = scrollBar.querySelector('.scale__level');
+var lineScrollBar = scrollBar.querySelector('.scale__line');
+var filterCss;
+
 // Наложение эффекта на изображение
 var getEffect = function () {
   var effectList = document.querySelector('.effects__list');
 
   effectList.addEventListener('click', function (evt) {
+    var MAX_VALUE_EFFECT = 100;
     var effectPreview = document.querySelector('.img-upload__preview img');
     var target = evt.target;
     var inputValue = target.value;
     var effectName = 'effects__preview--' + inputValue;
     effectPreview.setAttribute('class', effectName);
     var inputChecked = document.querySelector('input[name="effect"]:checked').value;
-    getEffectStyle(inputChecked, 100);
-    changeEffectIntensity(100);
+
+    getEffectStyle(inputChecked, MAX_VALUE_EFFECT);
+
+    if (effectName === 'effects__preview--none') {
+      previewPicture.style.filter = 'none';
+      scrollBar.classList.toggle('hidden', true);
+    } else {
+      previewPicture.style.filter = filterCss;
+      scrollBar.classList.toggle('hidden', false);
+    }
+
+    changeEffectIntensity(MAX_VALUE_EFFECT);
   });
 };
 
-// Интенсивность эффекта - пока только перемещение пина
-var scrollBar = document.querySelector('.scale');
-var pinScrollBar = scrollBar.querySelector('.scale__pin');
-var levelScrollBar = scrollBar.querySelector('.scale__level');
-var line = scrollBar.querySelector('.scale__line');
-
+// передвижение пина - mousedown, mousemove, mouseup
 scrollBar.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
-  var widthScrollBar = line.clientWidth;
+  var widthScrollBar = lineScrollBar.clientWidth;
   var startCoords = {
     x: evt.clientX
   };
-
   var onMouseMove = function (moveEvt) {
-
     moveEvt.preventDefault();
-
     var shift = {
       x: startCoords.x - moveEvt.clientX
     };
-
     startCoords = {
       x: moveEvt.clientX
     };
 
     var posX = pinScrollBar.offsetLeft - shift.x;
-
     if (posX <= widthScrollBar) {
+
       pinScrollBar.style.left = posX + 'px';
       var value = parseInt(100 * (levelScrollBar.offsetWidth - shift.x) / (widthScrollBar), 10);
-      changeEffectIntensity(value);
+      previewPicture.style.filter = filterCss;
       getEffectStyle(name, value);
+      changeEffectIntensity(value);
     }
   };
-
   var onMouseUp = function (upEvt) {
     upEvt.preventDefault();
-
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
   };
-
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 });
@@ -230,39 +240,45 @@ var changeEffectIntensity = function (value) {
   levelScrollBar.style.width = value + '%';
 };
 
-var previewPicture = document.querySelector('.img-upload__preview');
-
+// получение имени эффекта и значение фильтра
 var getEffectStyle = function (name, value) {
+  var max = 1;
+  var min = 0;
+  var MAX_CHROME = 1;
+  var MAX_SEPIA = 1;
+  var MAX_PHOBOS = 3;
+  var MAX_HEAT = 2;
+  var filterUnit = '';
+
   switch (name) {
-    case 'none':
-      previewPicture.style.filter = 'none';
-      scrollBar.classList.toggle('hidden', true);
-      break;
     case 'chrome':
-      var max = 1;
-      var index = max * value / 100;
-      previewPicture.style.filter = 'grayscale(' + index + ')';
-      scrollBar.classList.toggle('hidden', false);
+      max = MAX_CHROME;
+      filterCss = 'grayscale';
       break;
     case 'sepia':
-      previewPicture.style.filter = 'sepia(' + (1 * value / 100) + ')';
-      scrollBar.classList.toggle('hidden', false);
+      max = MAX_SEPIA;
+      filterCss = 'sepia';
       break;
     case 'phobos':
-      previewPicture.style.filter = 'blur(' + (3 * value / 100) + 'px)';
-      scrollBar.classList.toggle('hidden', false);
+      max = MAX_PHOBOS;
+      filterUnit = 'px';
+      filterCss = 'blur';
       break;
     case 'heat':
-      previewPicture.style.filter = 'brightness(' + (3 * value / 100) + ')';
-      scrollBar.classList.toggle('hidden', false);
+      min = 1;
+      max = MAX_HEAT;
+      filterCss = 'brightness';
       break;
     case 'marvin':
-      previewPicture.style.filter = 'invert(' + value + '%)';
-      scrollBar.classList.toggle('hidden', false);
+      filterUnit = '%';
+      filterCss = 'invert';
       break;
     default:
-      previewPicture.style.filter = 'none';
+      filterCss = 'none';
   }
+
+  value = min + (max * value / 100);
+  filterCss = filterCss + '(' + value + filterUnit + ')';
 };
 
 getEffect();
@@ -291,4 +307,5 @@ var getResize = function () {
     }
   });
 };
+
 getResize();
