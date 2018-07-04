@@ -163,10 +163,8 @@ closeEditPhoto.addEventListener('click', function () {
   onCloseEditPhotoClick();
 });
 
-// Эффекты
-var previewPicture = document.querySelector('.img-upload__preview');
-
 // Интенсивность эффекта
+var previewPicture = document.querySelector('.img-upload__preview');
 var scrollBar = document.querySelector('.scale');
 var pinScrollBar = scrollBar.querySelector('.scale__pin');
 var levelScrollBar = scrollBar.querySelector('.scale__level');
@@ -174,7 +172,6 @@ var lineScrollBar = scrollBar.querySelector('.scale__line');
 
 // Наложение эффекта на изображение
 var getEffect = function () {
-
   var effectList = document.querySelector('.effects__list');
 
   effectList.addEventListener('click', function (evt) {
@@ -193,7 +190,6 @@ var getEffect = function () {
       getPicEffect(getEffectStyle(inputChecked, MAX_VALUE_EFFECT));
       scrollBar.classList.toggle('hidden', false);
     }
-
     changeEffectIntensity(MAX_VALUE_EFFECT);
   });
 };
@@ -222,7 +218,6 @@ scrollBar.addEventListener('mousedown', function (evt) {
       var value = parseInt(100 * (levelScrollBar.offsetWidth - shift.x) / (widthScrollBar), 10);
 
       getPicEffect(getEffectStyle(inputChecked, value));
-
       changeEffectIntensity(value);
     }
   };
@@ -242,47 +237,20 @@ var changeEffectIntensity = function (value) {
 
 // получение имени эффекта и значение фильтра
 var getEffectStyle = function (name, value) {
-  var max = 1;
-  var min = 0;
-  var filterCss = '';
-  var filterUnit = '';
-
   switch (name) {
     case 'chrome':
-      max = 1;
-      value = max * value / 100;
-      filterCss = 'grayscale';
-      break;
+      return 'grayscale(' + (value / 100) + ')';
     case 'heat':
-      min = 1;
-      max = 2;
-      value = min + (max * value / 100);
-      filterCss = 'brightness';
-      break;
+      return 'brightness(' + (1 + (2 * value / 100)) + ')';
     case 'sepia':
-      max = 1;
-      value = max * value / 100;
-      filterCss = 'sepia';
-      break;
+      return 'sepia(' + (value / 100) + ')';
     case 'phobos':
-      max = 3;
-      value = max * value / 100;
-      filterUnit = 'px';
-      filterCss = 'blur';
-      break;
+      return 'blur(' + (3 * value / 100) + 'px)';
     case 'marvin':
-      max = 100;
-      value = max * value / 100;
-      filterUnit = '%';
-      filterCss = 'invert';
-      break;
+      return 'invert(' + value + '%)';
     default:
-      filterCss = 'none';
+      return 'none';
   }
-
-  filterCss = filterCss + '(' + value + filterUnit + ')';
-
-  return filterCss;
 };
 
 var getPicEffect = function (filter) {
