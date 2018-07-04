@@ -285,3 +285,20 @@ var getResize = function () {
 };
 
 getResize();
+
+// Хэш-теги
+var hashtags = document.querySelector('.text__hashtags');
+hashtags.addEventListener('change', function () {
+  var hashtagsMess = hashtags.value.toLowerCase();
+  var arrayOfStrings = hashtagsMess.split(' ');
+  for (var i = 0; i < arrayOfStrings.length; i++) {
+    if ((arrayOfStrings.length <= 5) &&
+      (arrayOfStrings[i].charAt(0) === '#') &&
+      (arrayOfStrings[i].length <= 20) &&
+      (arrayOfStrings[i] !== arrayOfStrings[i - 1])) {
+      return arrayOfStrings[i];
+    }
+    hashtags.setAttribute('style', 'border-color: red;');
+  }
+  return arrayOfStrings[i];
+});
