@@ -288,17 +288,44 @@ getResize();
 
 // Хэш-теги
 var hashtags = document.querySelector('.text__hashtags');
-hashtags.addEventListener('change', function () {
+var onGetHashtags = function () {
   var hashtagsMess = hashtags.value.toLowerCase();
   var arrayOfStrings = hashtagsMess.split(' ');
+  var repeaHashtags = [];
   for (var i = 0; i < arrayOfStrings.length; i++) {
-    if ((arrayOfStrings.length <= 5) &&
-      (arrayOfStrings[i].charAt(0) === '#') &&
-      (arrayOfStrings[i].length <= 20) &&
-      (arrayOfStrings[i] !== arrayOfStrings[i - 1])) {
-      return arrayOfStrings[i];
+    repeaHashtags = arrayOfStrings.filter(function (n) {
+      return n === arrayOfStrings[i];
+    });
+    if (arrayOfStrings.length <= 5) {
+      var elem = arrayOfStrings[i];
+      if (elem.charAt(0) !== '#') {
+        hashtags.setAttribute('style', 'border-color: red;');
+        hashtags.setCustomValidity('хэш-тег начинается с символа # (решётка)');
+        break;
+      } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
+        hashtags.setAttribute('style', 'border-color: red;');
+        hashtags.setCustomValidity('хеш-тег не может состоять только из одной решётки');
+        break;
+      } else if (elem.length >= 20) {
+        hashtags.setAttribute('style', 'border-color: red;');
+        hashtags.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
+        break;
+      } else if (repeaHashtags.length > 1) {
+        hashtags.setAttribute('style', 'border-color: red;');
+        hashtags.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
+        break;
+      } else {
+        hashtags.setCustomValidity('');
+      }
+    } else {
+      hashtags.setAttribute('style', 'border-color: red;');
+      hashtags.setCustomValidity('нельзя указать больше пяти хэш-тегов');
+      break;
     }
-    hashtags.setAttribute('style', 'border-color: red;');
   }
   return arrayOfStrings[i];
+};
+
+hashtags.addEventListener('change', function () {
+  onGetHashtags();
 });
