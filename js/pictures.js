@@ -119,11 +119,7 @@ var onBigPhotoEscPress = function (evt) {
 
 var onOpenBigPhotoClick = function () {
   bigPhoto.classList.remove('hidden');
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      onCloseBigPhotoClick();
-    }
-  });
+  document.addEventListener('keydown', onBigPhotoEscPress);
 };
 
 var onCloseBigPhotoClick = function () {
@@ -162,6 +158,10 @@ var onCloseEditPhotoClick = function () {
 closeEditPhoto.addEventListener('click', function () {
   onCloseEditPhotoClick();
 });
+
+// var onObjectFocus = function () {
+//   document.removeEventListener('keydown', onEditPhotoEscPress);
+// };
 
 // Интенсивность эффекта
 var previewPicture = document.querySelector('.img-upload__preview');
@@ -325,7 +325,43 @@ var onGetHashtags = function () {
   }
   return arrayOfStrings[i];
 };
-
 hashtags.addEventListener('change', function () {
   onGetHashtags();
 });
+
+// hashtags.addEventListener('focus', function () {
+//   onObjectFocus();
+// }, true);
+
+// hashtags.addEventListener('blur', function () {
+//   onObjectFocus();
+// }, true);
+
+// var onInputFocus = function (evt) {
+//   var target = evt.target;
+//   document.removeEventListener('keydown', onEditPhotoEscPress);
+//   target.addEventListener('blur', onOpenBigPhotoClick);
+// };
+
+var commentTexearea = document.querySelector('.text__description');
+var oncommentTexeareaValid = function () {
+  var commentTexeareaValue = commentTexearea.value;
+  var arrayOfStrings = commentTexeareaValue.split('');
+  if (arrayOfStrings.length >= 140) {
+    commentTexearea.setCustomValidity('длина комментария не может составлять больше 140 символов');
+  } else {
+    commentTexearea.setCustomValidity('');
+  }
+};
+
+commentTexearea.addEventListener('change', function () {
+  oncommentTexeareaValid();
+});
+
+// commentTexearea.addEventListener('focus', function () {
+//   onObjectFocus();
+// }, true);
+
+// commentTexearea.addEventListener('blur', function () {
+//   onObjectFocus();
+// }, true);
