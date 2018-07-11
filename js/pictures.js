@@ -43,7 +43,7 @@ var saveIndex = function (index) {
     evt.preventDefault();
     renderBigPhotos(photos[index]);
     commentsBigPhotos(evt);
-    onOpenBigPhotoClick();
+    onOpenPopup();
   };
 };
 
@@ -111,23 +111,29 @@ var bigPhoto = document.querySelector('.big-picture');
 var closeBigPhoto = document.querySelector('.big-picture__cancel');
 var ESC_KEYCODE = 27;
 
-var onBigPhotoEscPress = function (evt) {
+var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
-    onCloseBigPhotoClick();
+    closePopup();
   }
 };
 
-var onOpenBigPhotoClick = function () {
+var openPopup = function () {
   bigPhoto.classList.remove('hidden');
-  document.addEventListener('keydown', onBigPhotoEscPress);
+  document.addEventListener('keydown', onPopupEscPress);
 };
 
-var onCloseBigPhotoClick = function () {
+var closePopup = function () {
   bigPhoto.classList.add('hidden');
-  document.removeEventListener('keydown', onBigPhotoEscPress);
+  document.removeEventListener('keydown', onPopupEscPress);
 };
 
-closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
+closeBigPhoto.addEventListener('click', function () {
+  closePopup();
+});
+
+var onOpenPopup = function () {
+  openPopup();
+};
 
 // Загрузка изображения и показ формы редактирования
 var uploadPhoto = document.querySelector('#upload-file');
@@ -135,7 +141,12 @@ var editPhoto = document.querySelector('.img-upload__overlay');
 var closeEditPhoto = document.querySelector('#upload-cancel');
 
 uploadPhoto.addEventListener('change', function () {
+
   editPhoto.classList.remove('hidden');
+  hashtags.addEventListener('focus', onInputFocus);
+  hashtags.addEventListener('blur', onInputFocus);
+  commentTexearea.addEventListener('focus', onInputFocus);
+  commentTexearea.addEventListener('blur', onInputFocus);
 });
 
 var onEditPhotoEscPress = function (evt) {
@@ -153,15 +164,15 @@ document.addEventListener('keydown', function (evt) {
 var onCloseEditPhotoClick = function () {
   editPhoto.classList.add('hidden');
   document.removeEventListener('keydown', onEditPhotoEscPress);
+  hashtags.removeEventListener('focus', onInputFocus);
+  hashtags.removeEventListener('blur', onInputFocus);
+  commentTexearea.removeEventListener('focus', onInputFocus);
+  commentTexearea.removeEventListener('blur', onInputFocus);
 };
 
 closeEditPhoto.addEventListener('click', function () {
   onCloseEditPhotoClick();
 });
-
-// var onObjectFocus = function () {
-//   document.removeEventListener('keydown', onEditPhotoEscPress);
-// };
 
 // Интенсивность эффекта
 var previewPicture = document.querySelector('.img-upload__preview');
@@ -329,19 +340,11 @@ hashtags.addEventListener('change', function () {
   onGetHashtags();
 });
 
-// hashtags.addEventListener('focus', function () {
-//   onObjectFocus();
-// }, true);
-
-// hashtags.addEventListener('blur', function () {
-//   onObjectFocus();
-// }, true);
-
-// var onInputFocus = function (evt) {
-//   var target = evt.target;
-//   document.removeEventListener('keydown', onEditPhotoEscPress);
-//   target.addEventListener('blur', onOpenBigPhotoClick);
-// };
+var onInputFocus = function (evt) {
+  var target = evt.target;
+  document.removeEventListener('keydown', onEditPhotoEscPress);
+  target.addEventListener('blur', onEditPhotoEscPress);
+};
 
 var commentTexearea = document.querySelector('.text__description');
 var oncommentTexeareaValid = function () {
@@ -357,11 +360,3 @@ var oncommentTexeareaValid = function () {
 commentTexearea.addEventListener('change', function () {
   oncommentTexeareaValid();
 });
-
-// commentTexearea.addEventListener('focus', function () {
-//   onObjectFocus();
-// }, true);
-
-// commentTexearea.addEventListener('blur', function () {
-//   onObjectFocus();
-// }, true);
