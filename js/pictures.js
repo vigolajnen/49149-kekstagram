@@ -1,5 +1,6 @@
 'use strict';
 
+var isFocus = false;
 var QUANTITY_IMAGES = 25;
 var LIKES_MIN = 15;
 var LIKES_MAX = 200;
@@ -141,33 +142,28 @@ var editPhoto = document.querySelector('.img-upload__overlay');
 var closeEditPhoto = document.querySelector('#upload-cancel');
 
 uploadPhoto.addEventListener('change', function () {
-
   editPhoto.classList.remove('hidden');
+  document.addEventListener('keydown', onEditPhotoEscPress);
   hashtags.addEventListener('focus', onInputFocus);
-  hashtags.addEventListener('blur', onInputFocus);
+  hashtags.addEventListener('blur', onInputBlur);
   commentTexearea.addEventListener('focus', onInputFocus);
-  commentTexearea.addEventListener('blur', onInputFocus);
+  commentTexearea.addEventListener('blur', onInputBlur);
 });
 
 var onEditPhotoEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
+  if (evt.keyCode === ESC_KEYCODE && !isFocus) {
     onCloseEditPhotoClick();
   }
 };
 
-document.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    onCloseEditPhotoClick();
-  }
-});
 
 var onCloseEditPhotoClick = function () {
   editPhoto.classList.add('hidden');
   document.removeEventListener('keydown', onEditPhotoEscPress);
   hashtags.removeEventListener('focus', onInputFocus);
-  hashtags.removeEventListener('blur', onInputFocus);
+  hashtags.removeEventListener('blur', onInputBlur);
   commentTexearea.removeEventListener('focus', onInputFocus);
-  commentTexearea.removeEventListener('blur', onInputFocus);
+  commentTexearea.removeEventListener('blur', onInputBlur);
 };
 
 closeEditPhoto.addEventListener('click', function () {
@@ -298,16 +294,20 @@ var getResize = function () {
 getResize();
 
 // Хэш-теги
+var commentTexearea = document.querySelector('.text__description');
 var hashtags = document.querySelector('.text__hashtags');
 var onGetHashtags = function () {
   var hashtagsMess = hashtags.value.toLowerCase();
   var arrayOfStrings = hashtagsMess.split(' ');
   var repeaHashtags = [];
-  for (var i = 0; i < arrayOfStrings.length; i++) {
-    repeaHashtags = arrayOfStrings.filter(function (n) {
-      return n === arrayOfStrings[i];
-    });
-    if (arrayOfStrings.length <= 5) {
+  if (arrayOfStrings.length > 5) {
+    hashtags.setAttribute('style', 'border-color: red;');
+    hashtags.setCustomValidity('нельзя указать больше пяти хэш-тегов');
+  } else {
+    for (var i = 0; i < arrayOfStrings.length; i++) {
+      repeaHashtags = arrayOfStrings.filter(function (n) {
+        return n === arrayOfStrings[i];
+      });
       var elem = arrayOfStrings[i];
       if (elem.charAt(0) !== '#') {
         hashtags.setAttribute('style', 'border-color: red;');
@@ -328,35 +328,19 @@ var onGetHashtags = function () {
       } else {
         hashtags.setCustomValidity('');
       }
-    } else {
-      hashtags.setAttribute('style', 'border-color: red;');
-      hashtags.setCustomValidity('нельзя указать больше пяти хэш-тегов');
-      break;
     }
   }
-  return arrayOfStrings[i];
 };
 hashtags.addEventListener('change', function () {
   onGetHashtags();
 });
 
-var onInputFocus = function (evt) {
-  var target = evt.target;
-  document.removeEventListener('keydown', onEditPhotoEscPress);
-  target.addEventListener('blur', onEditPhotoEscPress);
+var onInputFocus = function () {
+  // console.log('isFocus', evt.target);
+  isFocus = true;
 };
 
-var commentTexearea = document.querySelector('.text__description');
-var oncommentTexeareaValid = function () {
-  var commentTexeareaValue = commentTexearea.value;
-  var arrayOfStrings = commentTexeareaValue.split('');
-  if (arrayOfStrings.length >= 140) {
-    commentTexearea.setCustomValidity('длина комментария не может составлять больше 140 символов');
-  } else {
-    commentTexearea.setCustomValidity('');
-  }
+var onInputBlur = function () {
+  // console.log('isBlur', evt.target);
+  isFocus = false;
 };
-
-commentTexearea.addEventListener('change', function () {
-  oncommentTexeareaValid();
-});
