@@ -303,16 +303,9 @@ var onInputValidMess = function () {
   var arrayOfStrings = hashtagsMess.split(' ');
   var repeaHashtags = [];
   var textErrorString;
-  var textErrors = [
-    'нельзя указать больше пяти хэш-тегов',
-    'хэш-тег начинается с символа # (решётка)',
-    'хеш-тег не может состоять только из одной решётки',
-    'максимальная длина одного хэш-тега 20 символов, включая решётку',
-    'один и тот же хэш-тег не может быть использован дважды'
-  ];
 
   if (arrayOfStrings.length > 5) {
-    textErrorString = textErrors[0];
+    textErrorString = 'нельзя указать больше пяти хэш-тегов';
   } else {
     for (var i = 0; i < arrayOfStrings.length; i++) {
       repeaHashtags = arrayOfStrings.filter(function (n) {
@@ -320,16 +313,16 @@ var onInputValidMess = function () {
       });
       var elem = arrayOfStrings[i];
       if (elem.charAt(0) !== '#') {
-        textErrorString = textErrors[1];
+        textErrorString = 'хэш-тег начинается с символа # (решётка)';
         break;
       } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
-        textErrorString = textErrors[2];
+        textErrorString = 'хеш-тег не может состоять только из одной решётки';
         break;
       } else if (elem.length >= 20) {
-        textErrorString = textErrors[3];
+        textErrorString = 'максимальная длина одного хэш-тега 20 символов, включая решётку';
         break;
       } else if (repeaHashtags.length > 1) {
-        textErrorString = textErrors[4];
+        textErrorString = 'один и тот же хэш-тег не может быть использован дважды';
         break;
       } else {
         textErrorString = '';
@@ -341,11 +334,7 @@ var onInputValidMess = function () {
 };
 
 var cssInvalidInput = function (inputSelector) {
-  return inputSelector.validity.valid ? (
-    inputSelector.style.borderColor = 'transparent'
-  ) : (
-    inputSelector.style.borderColor = 'red'
-  );
+  inputSelector.style.borderColor = inputSelector.validity.valid ? 'transparent' : 'red';
 };
 
 hashtagInput.addEventListener('input', function (evt) {
