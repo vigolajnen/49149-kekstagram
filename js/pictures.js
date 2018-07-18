@@ -302,48 +302,50 @@ var onInputValidMess = function () {
   var hashtagsMess = hashtagInput.value.toLowerCase();
   var arrayOfStrings = hashtagsMess.split(' ');
   var repeaHashtags = [];
-  if (arrayOfStrings.length > 5) {
-    hashtagInput.setCustomValidity('нельзя указать больше пяти хэш-тегов');
-    cssInvalidInput(hashtagInput);
-  } else {
+  var textErrorString;
+  var textErrors = [
+    'нельзя указать больше пяти хэш-тегов',
+    'хэш-тег начинается с символа # (решётка)',
+    'хеш-тег не может состоять только из одной решётки',
+    'максимальная длина одного хэш-тега 20 символов, включая решётку',
+    'один и тот же хэш-тег не может быть использован дважды'
+  ];
 
+  if (arrayOfStrings.length > 5) {
+    textErrorString = textErrors[0];
+  } else {
     for (var i = 0; i < arrayOfStrings.length; i++) {
       repeaHashtags = arrayOfStrings.filter(function (n) {
         return n === arrayOfStrings[i];
       });
-
       var elem = arrayOfStrings[i];
-
       if (elem.charAt(0) !== '#') {
-        hashtagInput.setCustomValidity('хэш-тег начинается с символа # (решётка)');
-        cssInvalidInput(hashtagInput);
+        textErrorString = textErrors[1];
         break;
       } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
-        hashtagInput.setCustomValidity('хеш-тег не может состоять только из одной решётки');
-        cssInvalidInput(hashtagInput);
+        textErrorString = textErrors[2];
         break;
       } else if (elem.length >= 20) {
-        hashtagInput.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
-        cssInvalidInput(hashtagInput);
+        textErrorString = textErrors[3];
         break;
       } else if (repeaHashtags.length > 1) {
-        hashtagInput.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
-        cssInvalidInput(hashtagInput);
+        textErrorString = textErrors[4];
         break;
       } else {
-        hashtagInput.setCustomValidity('');
-        cssInvalidInput(hashtagInput);
+        textErrorString = '';
       }
     }
   }
+  hashtagInput.setCustomValidity(textErrorString);
+  cssInvalidInput(hashtagInput);
 };
 
 var cssInvalidInput = function (inputSelector) {
-  if (inputSelector.validity.valid) {
-    inputSelector.style.borderColor = 'transparent';
-  } else {
-    inputSelector.style.borderColor = 'red';
-  }
+  return inputSelector.validity.valid ? (
+    inputSelector.style.borderColor = 'transparent'
+  ) : (
+    inputSelector.style.borderColor = 'red'
+  );
 };
 
 hashtagInput.addEventListener('input', function (evt) {
