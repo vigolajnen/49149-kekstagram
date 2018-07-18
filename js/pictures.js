@@ -1,5 +1,6 @@
 'use strict';
 
+var isFocus = false;
 var QUANTITY_IMAGES = 25;
 var LIKES_MIN = 15;
 var LIKES_MAX = 200;
@@ -43,7 +44,7 @@ var saveIndex = function (index) {
     evt.preventDefault();
     renderBigPhotos(photos[index]);
     commentsBigPhotos(evt);
-    onOpenBigPhotoClick();
+    onOpenPopup();
   };
 };
 
@@ -111,27 +112,29 @@ var bigPhoto = document.querySelector('.big-picture');
 var closeBigPhoto = document.querySelector('.big-picture__cancel');
 var ESC_KEYCODE = 27;
 
-var onBigPhotoEscPress = function (evt) {
+var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
-    onCloseBigPhotoClick();
+    closePopup();
   }
 };
 
-var onOpenBigPhotoClick = function () {
+var openPopup = function () {
   bigPhoto.classList.remove('hidden');
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      onCloseBigPhotoClick();
-    }
-  });
+  document.addEventListener('keydown', onPopupEscPress);
 };
 
-var onCloseBigPhotoClick = function () {
+var closePopup = function () {
   bigPhoto.classList.add('hidden');
-  document.removeEventListener('keydown', onBigPhotoEscPress);
+  document.removeEventListener('keydown', onPopupEscPress);
 };
 
-closeBigPhoto.addEventListener('click', onCloseBigPhotoClick);
+closeBigPhoto.addEventListener('click', function () {
+  closePopup();
+});
+
+var onOpenPopup = function () {
+  openPopup();
+};
 
 // Загрузка изображения и показ формы редактирования
 var uploadPhoto = document.querySelector('#upload-file');
@@ -140,23 +143,27 @@ var closeEditPhoto = document.querySelector('#upload-cancel');
 
 uploadPhoto.addEventListener('change', function () {
   editPhoto.classList.remove('hidden');
+  document.addEventListener('keydown', onEditPhotoEscPress);
+  hashtagInput.addEventListener('focus', onInputFocus);
+  hashtagInput.addEventListener('blur', onInputBlur);
+  commentTexearea.addEventListener('focus', onInputFocus);
+  commentTexearea.addEventListener('blur', onInputBlur);
 });
 
 var onEditPhotoEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
+  if (evt.keyCode === ESC_KEYCODE && !isFocus) {
     onCloseEditPhotoClick();
   }
 };
 
-document.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    onCloseEditPhotoClick();
-  }
-});
 
 var onCloseEditPhotoClick = function () {
   editPhoto.classList.add('hidden');
   document.removeEventListener('keydown', onEditPhotoEscPress);
+  hashtagInput.removeEventListener('focus', onInputFocus);
+  hashtagInput.removeEventListener('blur', onInputBlur);
+  commentTexearea.removeEventListener('focus', onInputFocus);
+  commentTexearea.removeEventListener('blur', onInputBlur);
 };
 
 closeEditPhoto.addEventListener('click', function () {
@@ -285,3 +292,59 @@ var getResize = function () {
 };
 
 getResize();
+
+// Хэш-теги
+var formUpload = document.querySelector('.img-upload__form');
+var commentTexearea = formUpload.querySelector('.text__description');
+var hashtagInput = formUpload.querySelector('.text__hashtags');
+
+var onInputValidMess = function () {
+  var hashtagsMess = hashtagInput.value.toLowerCase();
+  var arrayOfStrings = hashtagsMess.split(' ');
+  var repeaHashtags = [];
+  var textErrorString;
+
+  if (arrayOfStrings.length > 5) {
+    textErrorString = 'нельзя указать больше пяти хэш-тегов';
+  } else {
+    for (var i = 0; i < arrayOfStrings.length; i++) {
+      repeaHashtags = arrayOfStrings.filter(function (n) {
+        return n === arrayOfStrings[i];
+      });
+      var elem = arrayOfStrings[i];
+      if (elem.charAt(0) !== '#') {
+        textErrorString = 'хэш-тег начинается с символа # (решётка)';
+        break;
+      } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
+        textErrorString = 'хеш-тег не может состоять только из одной решётки';
+        break;
+      } else if (elem.length >= 20) {
+        textErrorString = 'максимальная длина одного хэш-тега 20 символов, включая решётку';
+        break;
+      } else if (repeaHashtags.length > 1) {
+        textErrorString = 'один и тот же хэш-тег не может быть использован дважды';
+        break;
+      } else {
+        textErrorString = '';
+      }
+    }
+  }
+  hashtagInput.setCustomValidity(textErrorString);
+  cssInvalidInput(hashtagInput);
+};
+
+var cssInvalidInput = function (inputSelector) {
+  inputSelector.style.borderColor = inputSelector.validity.valid ? 'transparent' : 'red';
+};
+
+hashtagInput.addEventListener('input', function (evt) {
+  onInputValidMess(evt);
+});
+
+var onInputFocus = function () {
+  isFocus = true;
+};
+
+var onInputBlur = function () {
+  isFocus = false;
+};
