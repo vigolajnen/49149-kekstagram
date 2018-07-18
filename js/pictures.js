@@ -144,8 +144,8 @@ var closeEditPhoto = document.querySelector('#upload-cancel');
 uploadPhoto.addEventListener('change', function () {
   editPhoto.classList.remove('hidden');
   document.addEventListener('keydown', onEditPhotoEscPress);
-  hashtags.addEventListener('focus', onInputFocus);
-  hashtags.addEventListener('blur', onInputBlur);
+  hashtagInput.addEventListener('focus', onInputFocus);
+  hashtagInput.addEventListener('blur', onInputBlur);
   commentTexearea.addEventListener('focus', onInputFocus);
   commentTexearea.addEventListener('blur', onInputBlur);
 });
@@ -160,8 +160,8 @@ var onEditPhotoEscPress = function (evt) {
 var onCloseEditPhotoClick = function () {
   editPhoto.classList.add('hidden');
   document.removeEventListener('keydown', onEditPhotoEscPress);
-  hashtags.removeEventListener('focus', onInputFocus);
-  hashtags.removeEventListener('blur', onInputBlur);
+  hashtagInput.removeEventListener('focus', onInputFocus);
+  hashtagInput.removeEventListener('blur', onInputBlur);
   commentTexearea.removeEventListener('focus', onInputFocus);
   commentTexearea.removeEventListener('blur', onInputBlur);
 };
@@ -294,53 +294,66 @@ var getResize = function () {
 getResize();
 
 // Хэш-теги
-var commentTexearea = document.querySelector('.text__description');
-var hashtags = document.querySelector('.text__hashtags');
-var onGetHashtags = function () {
-  var hashtagsMess = hashtags.value.toLowerCase();
+var formUpload = document.querySelector('.img-upload__form');
+var commentTexearea = formUpload.querySelector('.text__description');
+var hashtagInput = formUpload.querySelector('.text__hashtags');
+
+var onInputValidMess = function () {
+  var hashtagsMess = hashtagInput.value.toLowerCase();
   var arrayOfStrings = hashtagsMess.split(' ');
   var repeaHashtags = [];
   if (arrayOfStrings.length > 5) {
-    hashtags.setAttribute('style', 'border-color: red;');
-    hashtags.setCustomValidity('нельзя указать больше пяти хэш-тегов');
+    hashtagInput.setCustomValidity('нельзя указать больше пяти хэш-тегов');
+    cssInvalidInput(hashtagInput);
   } else {
+
     for (var i = 0; i < arrayOfStrings.length; i++) {
       repeaHashtags = arrayOfStrings.filter(function (n) {
         return n === arrayOfStrings[i];
       });
+
       var elem = arrayOfStrings[i];
+
       if (elem.charAt(0) !== '#') {
-        hashtags.setAttribute('style', 'border-color: red;');
-        hashtags.setCustomValidity('хэш-тег начинается с символа # (решётка)');
+        hashtagInput.setCustomValidity('хэш-тег начинается с символа # (решётка)');
+        cssInvalidInput(hashtagInput);
         break;
       } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
-        hashtags.setAttribute('style', 'border-color: red;');
-        hashtags.setCustomValidity('хеш-тег не может состоять только из одной решётки');
+        hashtagInput.setCustomValidity('хеш-тег не может состоять только из одной решётки');
+        cssInvalidInput(hashtagInput);
         break;
       } else if (elem.length >= 20) {
-        hashtags.setAttribute('style', 'border-color: red;');
-        hashtags.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
+        hashtagInput.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
+        cssInvalidInput(hashtagInput);
         break;
       } else if (repeaHashtags.length > 1) {
-        hashtags.setAttribute('style', 'border-color: red;');
-        hashtags.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
+        hashtagInput.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
+        cssInvalidInput(hashtagInput);
         break;
       } else {
-        hashtags.setCustomValidity('');
+        hashtagInput.setCustomValidity('');
+        cssInvalidInput(hashtagInput);
       }
     }
   }
 };
-hashtags.addEventListener('change', function () {
-  onGetHashtags();
+
+var cssInvalidInput = function (inputSelector) {
+  if (inputSelector.validity.valid) {
+    inputSelector.style.borderColor = 'transparent';
+  } else {
+    inputSelector.style.borderColor = 'red';
+  }
+};
+
+hashtagInput.addEventListener('input', function (evt) {
+  onInputValidMess(evt);
 });
 
 var onInputFocus = function () {
-  // console.log('isFocus', evt.target);
   isFocus = true;
 };
 
 var onInputBlur = function () {
-  // console.log('isBlur', evt.target);
   isFocus = false;
 };
