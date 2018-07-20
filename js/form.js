@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  // Загрузка изображения и показ формы редактирования
   var isFocus = false;
+  // Загрузка изображения и показ формы редактирования
   var uploadPhoto = document.querySelector('#upload-file');
   var editPhoto = document.querySelector('.img-upload__overlay');
   var closeEditPhoto = document.querySelector('#upload-cancel');
@@ -17,7 +17,7 @@
   });
 
   var onEditPhotoEscPress = function (evt) {
-    if (window.util.isEscPress(evt)) {
+    if (window.util.isEscEvent(evt) && !isFocus) {
       onCloseEditPhotoClick();
     }
   };
@@ -111,28 +111,28 @@
   var getEffectStyle = function (name, value) {
     switch (name) {
       case 'chrome':
-      return 'grayscale(' + (value / 100) + ')';
+        return 'grayscale(' + (value / 100) + ')';
       case 'heat':
-      return 'brightness(' + (1 + (2 * value / 100)) + ')';
+        return 'brightness(' + (1 + (2 * value / 100)) + ')';
       case 'sepia':
-      return 'sepia(' + (value / 100) + ')';
+        return 'sepia(' + (value / 100) + ')';
       case 'phobos':
-      return 'blur(' + (3 * value / 100) + 'px)';
+        return 'blur(' + (3 * value / 100) + 'px)';
       case 'marvin':
-      return 'invert(' + value + '%)';
+        return 'invert(' + value + '%)';
       default:
-      return 'none';
+        return 'none';
     }
   };
 
   var getPicEffect = function (filter) {
     previewPicture.style.filter = filter;
-   };
+  };
 
-    getEffect();
+  getEffect();
 
-    // Масштаб
-    var getResize = function () {
+  // Масштаб
+  var getResize = function () {
     var resize = document.querySelector('.resize');
     var controlMinus = resize.querySelector('.resize__control--minus');
     var controlPlus = resize.querySelector('.resize__control--plus');
@@ -142,76 +142,75 @@
     resizeValue.value = MAX_RESIZE;
 
     controlPlus.addEventListener('click', function () {
-        if (parseInt(resizeValue.value, 10) <= 75) {
+      if (parseInt(resizeValue.value, 10) <= 75) {
         resizeValue.value = parseInt(resizeValue.value, 10) + 25 + '%';
         resizePicture.style.transform = 'scale(' + parseInt(resizeValue.value, 10) / 100 + ')';
-        }
+      }
     });
 
     controlMinus.addEventListener('click', function () {
-        if (parseInt(resizeValue.value, 10) > 25) {
+      if (parseInt(resizeValue.value, 10) > 25) {
         resizeValue.value = parseInt(resizeValue.value, 10) - 25 + '%';
         resizePicture.style.transform = 'scale(' + parseInt(resizeValue.value, 10) / 100 + ')';
-        }
+      }
     });
-    };
+  };
 
-    getResize();
+  getResize();
 
-    // Хэш-теги
-    var formUpload = document.querySelector('.img-upload__form');
-    var commentTexearea = formUpload.querySelector('.text__description');
-    var hashtagInput = formUpload.querySelector('.text__hashtags');
+  // Хэш-теги
+  var formUpload = document.querySelector('.img-upload__form');
+  var commentTexearea = formUpload.querySelector('.text__description');
+  var hashtagInput = formUpload.querySelector('.text__hashtags');
 
-    var onInputValidMess = function () {
+  var onInputValidMess = function () {
     var hashtagsMess = hashtagInput.value.toLowerCase();
     var arrayOfStrings = hashtagsMess.split(' ');
     var repeaHashtags = [];
     var textErrorString;
 
     if (arrayOfStrings.length > 5) {
-        textErrorString = 'нельзя указать больше пяти хэш-тегов';
+      textErrorString = 'нельзя указать больше пяти хэш-тегов';
     } else {
-        for (var i = 0; i < arrayOfStrings.length; i++) {
-            repeaHashtags = arrayOfStrings.filter(function (n) {
-                return n === arrayOfStrings[i];
-            });
-            var elem = arrayOfStrings[i];
-            if (elem.charAt(0) !== '#') {
-                textErrorString = 'хэш-тег начинается с символа # (решётка)';
-                break;
-            } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
-                textErrorString = 'хеш-тег не может состоять только из одной решётки';
-                break;
-            } else if (elem.length >= 20) {
-                textErrorString = 'максимальная длина одного хэш-тега 20 символов, включая решётку';
-                break;
-            } else if (repeaHashtags.length > 1) {
-                textErrorString = 'один и тот же хэш-тег не может быть использован дважды';
-                break;
-            } else {
-                textErrorString = '';
-            }
+      for (var i = 0; i < arrayOfStrings.length; i++) {
+        repeaHashtags = arrayOfStrings.filter(function (n) {
+          return n === arrayOfStrings[i];
+        });
+        var elem = arrayOfStrings[i];
+        if (elem.charAt(0) !== '#') {
+          textErrorString = 'хэш-тег начинается с символа # (решётка)';
+          break;
+        } else if ((elem.length === 1) && (elem.charAt(0) === '#')) {
+          textErrorString = 'хеш-тег не может состоять только из одной решётки';
+          break;
+        } else if (elem.length >= 20) {
+          textErrorString = 'максимальная длина одного хэш-тега 20 символов, включая решётку';
+          break;
+        } else if (repeaHashtags.length > 1) {
+          textErrorString = 'один и тот же хэш-тег не может быть использован дважды';
+          break;
+        } else {
+          textErrorString = '';
         }
+      }
     }
     hashtagInput.setCustomValidity(textErrorString);
     cssInvalidInput(hashtagInput);
-    };
+  };
 
-    
-    var cssInvalidInput = function (inputSelector) {
+  var cssInvalidInput = function (inputSelector) {
     inputSelector.style.borderColor = inputSelector.validity.valid ? 'transparent' : 'red';
-    };
+  };
 
-    hashtagInput.addEventListener('input', function (evt) {
+  hashtagInput.addEventListener('input', function (evt) {
     onInputValidMess(evt);
-    });
+  });
 
-    var onInputFocus = function () {
-        isFocus = true;
-    };
+  var onInputFocus = function () {
+    isFocus = true;
+  };
 
-    var onInputBlur = function () {
-        isFocus = false;
-    };
+  var onInputBlur = function () {
+    isFocus = false;
+  };
 })();
